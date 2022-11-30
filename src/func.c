@@ -13,22 +13,21 @@
 #include "func.h"
 #include "defs.h"
 
-
 void NLastLinesFromFile(char* name, int fd_client, struct simplemessage msg, int N) {
     FILE* filePointer;
     int bufferLength = 255;
     char buffer[bufferLength];
     ssize_t read_bytes;
     if(lstat(name, &buffer) < 0) {
-		strcpy(msg.sm_data, "Этого файла не существует\n");
-        syslog(LOG_INFO, "Клиент %d: %s", msg.sm_clientpid, msg.sm_data);
+		strcpy(msg.sm_data, "This file doesn't exist\n");
+        syslog(LOG_INFO, "Client %d: %s", msg.sm_clientpid, msg.sm_data);
         write(fd_client, &msg, sizeof(msg));
         return;
 	}
     filePointer = fopen(name, "r");
     if(filePointer == -1) {
-        syslog(LOG_ERR, "Клиент %i не удалось открыть файл", msg.sm_clientpid);
-        strcpy(msg.sm_data, "Не удалось открыть файл\n");
+        syslog(LOG_ERR, "Client %i failed to open file", msg.sm_clientpid);
+        strcpy(msg.sm_data, "Failed to open file\n");
         write(fd_client, &msg, sizeof(msg));
         return;
     }
@@ -53,13 +52,12 @@ void NLastLinesFromFile(char* name, int fd_client, struct simplemessage msg, int
     write(fd_client, &msg, sizeof(msg));
     return;
 }
-    
 
 void IsSymbolicLink(char* name, int fd_client, struct simplemessage msg) {
 	struct stat buff;
 	if(lstat(name, &buff) < 0) {
-		strcpy(msg.sm_data, "Этого файла не существует\n");
-        syslog(LOG_INFO, "Клиент %d: %s", msg.sm_clientpid, msg.sm_data);
+		strcpy(msg.sm_data, "This file doesn't exist\n");
+        syslog(LOG_INFO, "Client %d: %s", msg.sm_clientpid, msg.sm_data);
         write(fd_client, &msg, sizeof(msg));
         return;
 	}
@@ -74,7 +72,6 @@ void IsSymbolicLink(char* name, int fd_client, struct simplemessage msg) {
     return;
 }
 
-
 void FileMetaData(char* name, int fd_client, struct simplemessage msg) {
     struct stat buff;
     int temp = 0;
@@ -82,7 +79,7 @@ void FileMetaData(char* name, int fd_client, struct simplemessage msg) {
         syslog(LOG_ERR, "Client %i: file doesn't exist", msg.sm_clientpid);
         strcpy(msg.sm_data, "This file doesn't exist\n");
         write(fd_client, &msg, sizeof(msg));
-        return -1;
+        return;
 	}
     syslog(LOG_INFO, "Client %i: file exist", msg.sm_clientpid);
     char* toReturn = malloc(3 * (30 + strlen(ctime(&buff.st_ctime))));

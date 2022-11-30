@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
    int count = 0;
    fp = popen("ps -x", "r");
    while (fgets(path, sizeof(path), fp) != NULL) {
-         if(strstr(path, "my_server") != NULL){
+         if(strstr(path, "server") != NULL){
                count++;
                if(count > 1) {
                   printf("Server already exists\n");
@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
    struct simplemessage msg;
    daemon(1, 1);
    openlog("my_server", LOG_PID, LOG_USER);
-   syslog(LOG_INFO, "Сервер запущен");
+   syslog(LOG_INFO, "Server opened");
    if (mkfifo(SERVER_FIFO_NAME, PERM_FILE) == -1 && errno != EEXIST) {
       syslog(LOG_ERR, "Channel creating error %s", SERVER_FIFO_NAME);
       return 1;
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
             }
 
             if(messageLength == 0) {
-               strcpy(msg.sm_data, "Некорректная запись");
+               strcpy(msg.sm_data, "Incorrect entry");
                write(fd_client, &msg, sizeof(msg));
             }
             syslog(LOG_INFO, "Client request %i has been completed", msg.sm_clientpid);

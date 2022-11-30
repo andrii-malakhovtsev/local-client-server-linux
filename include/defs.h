@@ -22,6 +22,7 @@ struct simplemessage
 	int N;
 };
 
+void showmenu();
 char* makefifoname(pid_t pid, const char* prefix);
 
 #endif

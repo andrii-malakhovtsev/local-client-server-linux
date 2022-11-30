@@ -60,7 +60,7 @@ int main() {
       printf("%s", msg.sm_data);
    }
    printf("\n");
-   printf("Clinet %ld finished working!\n", (long)msg.sm_clientpid);
+   printf("Client %ld finished working!\n", (long)msg.sm_clientpid);
    close(fd_server);
    close(fd_client);
    unlink(pfifoname);               

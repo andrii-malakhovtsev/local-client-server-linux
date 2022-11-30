@@ -1,5 +1,5 @@
 OBJS = server.o func.o
-TARGET = my_server
+TARGET = server
 
 $(TARGET): $(OBJS)
 	$(CC) $^ -o $@
