@@ -14,10 +14,8 @@ char* makefifoname(pid_t pid, const char* prefix)
    return pfifoname;
 }
 
-int main()
-{
-   int fd_server, 
-       fd_client = -1;
+int main() { 
+   int fd_server, fd_client = -1;
    ssize_t nread;
    struct simplemessage msg;
    char* pfifoname;
@@ -37,9 +35,9 @@ int main()
    }
 
    printf("\n-------------------------Меню---------------------------\n");
-	printf("-n *файл*     - N последних строк файла\n");
-	printf("-s *файл*     - является ли файл символической ссылкой\n");
-	printf("-m *файл*     - мета-данные файла\n\n");
+	printf("-n *file*     - N последних строк файла\n");
+	printf("-s *file*     - является ли файл символической ссылкой\n");
+	printf("-m *file*     - мета-данные файла\n\n");
 	printf("stopServer    - остановка работы сервера\n");
 	printf("--------------------------------------------------------\n\n");
 
@@ -48,11 +46,11 @@ int main()
    if (msg.sm_data[1] == 'n')
    {
       char str[BUFFERSIZE];
-      printf("Введите число N: ");
+      printf("Enter the N-digit: ");
       gets(str);
       msg.N = atoi(str);
       if(msg.N == NULL)
-         printf("\nВы ввели не число ");
+         printf("\nYou didn't enter a digit ");
    }
    write(fd_server, &msg, sizeof(msg));
 
@@ -69,7 +67,7 @@ int main()
    }
   
    printf("\n");
-   printf("Клиент %ld закончил работу\n", (long)msg.sm_clientpid);
+   printf("Clinet %ld finished working!\n", (long)msg.sm_clientpid);
    close(fd_server);
    close(fd_client);
    unlink(pfifoname);
