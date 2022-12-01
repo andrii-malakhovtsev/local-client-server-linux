@@ -43,7 +43,8 @@ In logs-terminal we will see   <br />
 </br>
 In client directory we have 2 shell-scripts </br> </br>
 <pre>
-<b>scriptmanual.sh </b> <br />
+<b>scriptmanual.sh </b> <br /> <br />
+
 
 \# Setup
 echo Hello, World! > test
@@ -61,9 +62,7 @@ echo "-s test" && ./client
 echo "-s test" && ./client
 
 \# Stop
-killall server
-</pre>
-</br>
+killall server </pre> </br> 
 <pre>
 <b>scriptparallel.sh </b> <br />
 
