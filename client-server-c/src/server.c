@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
    ssize_t nread;
    struct simplemessage msg;
    daemon(1, 1);
-   openlog("my_server", LOG_PID, LOG_USER);
+   openlog("server", LOG_PID, LOG_USER);
    syslog(LOG_INFO, "Server opened");
    if (mkfifo(SERVER_FIFO_NAME, PERM_FILE) == -1 && errno != EEXIST) {
       syslog(LOG_ERR, "Channel creating error %s", SERVER_FIFO_NAME);
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
             write(fd_client, &msg, sizeof(msg));
             close(fd_client);
             unlink(pfifoname);
-            system("killall my_server");
+            system("killall server");
             _exit(0);
             return 0;
          }
@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
                   break;
                }
                case 'm': {
-                  writeifilemetadata(name, fd_client, msg);
+                  writefilemetadata(name, fd_client, msg);
                   messageLength++;
                   break;
                }

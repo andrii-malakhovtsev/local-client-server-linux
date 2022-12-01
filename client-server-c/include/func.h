@@ -16,4 +16,5 @@
 void writeNlastlinesfromfile(char* name,  int fd_client, struct simplemessage msg, int N);
 void writeisfilesymboliclink(char* name, int fd_client, struct simplemessage msg);
 void writefilemetadata(char* name, int fd_client, struct simplemessage msg);
+
 #endif

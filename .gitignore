@@ -22,8 +22,10 @@
 *.la
 *.lo
 
-# Shared objects (inc. Windows DLLs)
-*.dll
+# shell-script
+*.sh.swp
+
+# Shared objects
 *.so
 *.so.*
 *.dylib

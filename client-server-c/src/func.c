@@ -63,8 +63,8 @@ void writeisfilesymboliclink(char* name, int fd_client, struct simplemessage msg
 	}
     syslog(LOG_INFO, "Client %i: file exist", msg.sm_clientpid);
 	if(S_ISLNK(buff.st_mode) == 1) {
-		strcpy(msg.sm_data, "It's symbolic link\n");
-    }	
+		strcpy(msg.sm_data, "It's a symbolic link\n");
+    }
 	else {
        strcpy(msg.sm_data, "It's not a symbolic link\n");
 	}
