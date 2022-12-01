@@ -13,7 +13,7 @@
 #include "func.h"
 #include "defs.h"
 
-void NLastLinesFromFile(char* name, int fd_client, struct simplemessage msg, int N) {
+void writeNlastlinesfromfile(char* name, int fd_client, struct simplemessage msg, int N) {
     FILE* filePointer;
     int bufferLength = 255;
     char buffer[bufferLength];
@@ -37,23 +37,23 @@ void NLastLinesFromFile(char* name, int fd_client, struct simplemessage msg, int
     }
     filePointer = fopen(name, "r");
     int counter = 0;
-    char* toReturn = malloc(strlen(buffer) * N);
-    strcpy(toReturn, "\0");
+    char* to_return = malloc(strlen(buffer) * N);
+    strcpy(to_return, "\0");
     int i = 0;
     while(fgets(buffer, bufferLength, filePointer)) {
         if(counter >= (linesCount - N)) {
-            strcat(toReturn, buffer);
+            strcat(to_return, buffer);
             i++;
         }
         counter++;
     }
     fclose(filePointer);
-    strcpy(msg.sm_data, toReturn);
+    strcpy(msg.sm_data, to_return);
     write(fd_client, &msg, sizeof(msg));
     return;
 }
 
-void IsSymbolicLink(char* name, int fd_client, struct simplemessage msg) {
+void writeisfilesymboliclink(char* name, int fd_client, struct simplemessage msg) {
 	struct stat buff;
 	if(lstat(name, &buff) < 0) {
 		strcpy(msg.sm_data, "This file doesn't exist\n");
@@ -72,7 +72,7 @@ void IsSymbolicLink(char* name, int fd_client, struct simplemessage msg) {
     return;
 }
 
-void FileMetaData(char* name, int fd_client, struct simplemessage msg) {
+void writefilemetadata(char* name, int fd_client, struct simplemessage msg) {
     struct stat buff;
     int temp = 0;
 	if(stat(name, &buff) == -1) {
@@ -85,7 +85,7 @@ void FileMetaData(char* name, int fd_client, struct simplemessage msg) {
     char* toReturn = malloc(3 * (30 + strlen(ctime(&buff.st_ctime))));
     strcpy(toReturn, "Last status change:  ");
     strcat(toReturn, ctime(&buff.st_ctime));
-    strcat(toReturn, "Last file access:     ");
+    strcat(toReturn, "Last file access:    ");
     strcat(toReturn, ctime(&buff.st_atime));
     strcat(toReturn, "Last file change:    ");
     strcat(toReturn, ctime(&buff.st_mtime));

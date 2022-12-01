@@ -86,17 +86,17 @@ int main(int argc, char *argv[]) {
             int messageLength = 0;
             switch(c) {
                case 'n': {
-                  NLastLinesFromFile(name, fd_client, msg, msg.N);
+                  writeNlastlinesfromfile(name, fd_client, msg, msg.N);
                   messageLength++;
                   break;
                }
                case 's': {
-                  IsSymbolicLink(name, fd_client, msg);
+                  writeisfilesymboliclink(name, fd_client, msg);
                   messageLength++;
                   break;
                }
                case 'm': {
-                  FileMetaData(name, fd_client, msg);
+                  writeifilemetadata(name, fd_client, msg);
                   messageLength++;
                   break;
                }

@@ -13,8 +13,8 @@
 
 #define BUFFERSIZE 256
 
-void NLastLinesFromFile(char* name,  int fd_client, struct simplemessage msg, int N);
-void IsSymbolicLink(char* name, int fd_client, struct simplemessage msg);
-void FileMetaData(char* name, int fd_client, struct simplemessage msg);
+void writenlastlinesfromfile(char* name,  int fd_client, struct simplemessage msg, int N);
+void writeisfilesymboliclink(char* name, int fd_client, struct simplemessage msg);
+void writefilemetadata(char* name, int fd_client, struct simplemessage msg);
 
 #endif
