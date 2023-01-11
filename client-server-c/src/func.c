@@ -49,6 +49,7 @@ void writeNlastlinesfromfile(char* name, int fd_client, struct simplemessage msg
     }
     fclose(filePointer);
     strcpy(msg.sm_data, to_return);
+    free(to_return);
     write(fd_client, &msg, sizeof(msg));
     return;
 }
@@ -90,6 +91,7 @@ void writefilemetadata(char* name, int fd_client, struct simplemessage msg) {
     strcat(toReturn, "Last file change:    ");
     strcat(toReturn, ctime(&buff.st_mtime));
     strcpy(msg.sm_data, toReturn);
+    free(toReturn);
     write(fd_client, &msg, sizeof(msg));
     return;
 }
