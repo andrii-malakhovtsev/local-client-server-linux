@@ -1,4 +1,4 @@
-## local "client-server(daemon)" interactions through UNIX shell variables concept
+## local "client-server"(daemon) interactions through UNIX shell variables concept
 
 Firstly, we need to open system journal with actievly <br />
 following logs in separate terminal
