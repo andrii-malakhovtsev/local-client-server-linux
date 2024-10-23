@@ -1,123 +1,126 @@
-# Local "client-server" interactions through UNIX shell variables
-This project on C is a local "client-server" (daemon) interactions through UNIX shell variables concept.
+# Local Client-Server Interactions Using UNIX Shell Variables
+This C project demonstrates local client-server (daemon) interactions using UNIX shell variables.
 
 ## Prerequisites
-* UNIX operating system
-* GCC compiler
+- UNIX-based operating system
+- GCC compiler
 
 ## Installation
 
-> All the commands must be entered in the terminal
-1. Clone this repository to your local machine.
-2. Compile the server program using the following command:
-```
-gcc server.c -o server
-```
-> or just use the already existing server-program in the same directory
-3. Compile the client program using the following command:
-```
-gcc client.c -o client
-```
-> or just use the already existing client-program in the same directory
+> All commands should be executed in the terminal.
+
+1. Clone this repository to your local machine:
+
+    ```
+    git clone https://github.com/malandrii/local-client-server-linux
+    ```
+2. Compile the server program:
+
+   ```
+    gcc server.c -o server
+    ```
+    > Alternatively, you can use the precompiled server program included in the directory.
+4. Compile the client program:
+
+   ```
+    gcc client.c -o client
+    ```
+    > Alternatively, you can use the precompiled client program included in the directory.
 
 ## Usage
 
-1. Firstly, we need to open system journal with actievly following logs in the separate terminal:
+1. Open a terminal and follow the system journal logs:
+    ``` 
+    journalctl -f 
+    ```
 
-``` 
-$ journalctl -f 
-```
+2. Launch the server application:
+    ```
+    ./bin/server ./server
+    ```
+    You should see the following output in the log terminal:
+    ```
+    [username] server[number]: Server opened
+    ```
 
-2. Now open a server-app
+3. In another terminal, start the client application:
+    ``` 
+    ./bin/client ./client 
+    ``` 
+    The following menu will appear:
+    ```
+    Client [number] started
+    ----------------Menu-------------------
+    -n [file]  - Show the last N lines of the file
+    -s [file]  - Check if the file is a symbolic link
+    -m [file]  - Display file metadata
+    stopServer - Stop the server
+    ---------------------------------------
+    Incoming request to server:
+    ```
 
-```
-$client-server-c/bin/server ./server
-```
+4. For example, to check file metadata, run:
+    ```
+    -m [filepath]
+    ```
+    The output will be similar to:
+    ```
+    Last status change: [date]
+    Last file access: [date]
+    Last file change: [date]
+    Client [number] finished working!
+    ```
 
-In logs-terminal we will see:
-> user-name server[*number*]: Server opened
+    In the log terminal, you will see:
+    ```
+    [username] server[number]: Received request from client [number]
+    [username] server[number]: Client [number]: file exists
+    [username] server[number]: Request from client [number] completed
+    ```
 
-3. Now open a client-app
+## Channels (Streams)
 
-``` 
-$client-server-c/bin/client ./client 
-``` 
-In the terminal we see:
-> Client *number* started <br />
-> ----------------Menu-------------------     <br />
-> -n *file*      - N last file lines         <br />
-> -s *file*      - is file a symbolic link   <br />
-> -m *file*      - file meta-data            <br />
-> <br />
-> stopServer      - stop server               <br />
-> ---------------------------------------     <br />
-> <br />
-> Incoming request to server:
+This program uses channels (streams), which can be tested for performance benefits.
 
-4. For example let's check file's metadata
+### The client program directory contains two shell scripts:
 
-> Incoming request to server: ``` -m *filepath* ``` <br />
-> <br />
-> Last status change: *date of status change*  <br />
-> Last file access: *date of last file access*    <br />
-> Last file change: *date of last file change*    <br />
-> <br />
-> Client *number* finished working!
+- **scriptmanual.sh**
+    ```
+    # Setup
+    echo "Hello, World!" > test
 
-In logs-terminal we will see   <br />
-> user-name server[*number*]: Got request from *client_number*                   <br />
-> user-name server[*number*]: Client *client_number*: file exist                 <br />
-> user-name server[*number*]: Client request *client_number* has been completed  <br />
+    # Start the server
+    ../server/./server
 
-## Channels (streams)
+    # Test
+    echo "-s test" && ./client
+    echo "-s test" && ./client
+    echo "-s test" && ./client
 
-Also the program uses channels (streams), performance profit of which we can test 
+    # Stop the server
+    killall server
+    ```
 
-### In the client-program directory we have 2 shell-scripts: </br>
+- **scriptparallel.sh**
+    ```
+    # Setup
+    echo "Hello, World!" > test
 
-> scriptmanual.sh
-``` 
-# Setup
-echo Hello, World! > test
+    # Start the server
+    ../server/./server
 
-# Start
-../server/./server
+    # Test in parallel
+    echo "-s test" || ./client &
+    echo "-s test" || ./client &
+    echo "-s test" || ./client &
 
-# Test
-echo "-s test" && ./client
-echo "-s test" && ./client
-echo "-s test" && ./client
-echo "-s test" && ./client
-echo "-s test" && ./client
-echo "-s test" && ./client
-echo "-s test" && ./client
+    # Stop the server
+    killall server
+    ```
 
-# Stop
-killall server 
-``` 
+The `scriptparallel.sh` runs all client programs in parallel, whereas `scriptmanual.sh` runs them one by one.
 
-> scriptparallel.sh
-
-``` 
-# Setup
-echo Hello, World! > test
-
-# Start
-../server/./server
-
-# Test
-echo "-s test" || ./client
-echo "-s test" || ./client
-echo "-s test" || ./client
-echo "-s test" || ./client
-echo "-s test" || ./client
-echo "-s test" || ./client
-echo "-s test" || ./client
-
-# Stop
-killall server
-``` 
-Obviously, ***scriptparallel.sh*** uses channels to each program it operates at the same time, unlike ***scriptmanual.sh*** which goes one by one. </br>
+### Test on ***scriptparallel.sh*** showed these results: </br>
 ``` 
 $client-server-c/bin/client time sh scriptmanual.sh
 ``` 
