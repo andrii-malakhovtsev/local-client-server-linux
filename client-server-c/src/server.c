@@ -24,15 +24,16 @@ int main(int argc, char *argv[]) {
    int count = 0;
    fp = popen("ps -x", "r");
    while (fgets(path, sizeof(path), fp) != NULL) {
-         if(strstr(path, "server") != NULL){
+         if (strstr(path, "server") != NULL){
                count++;
-               if(count > 1) {
+               if (count > 1) {
                   printf("Server already exists\n");
                   return 0;
                }
             }
    }
    pclose(fp);
+
    int fd_server,
        fd_dummy,
        fd_client = -1;
@@ -41,6 +42,7 @@ int main(int argc, char *argv[]) {
    daemon(1, 1);
    openlog("server", LOG_PID, LOG_USER);
    syslog(LOG_INFO, "Server opened");
+
    if (mkfifo(SERVER_FIFO_NAME, PERM_FILE) == -1 && errno != EEXIST) {
       syslog(LOG_ERR, "Channel creating error %s", SERVER_FIFO_NAME);
       return 1;
@@ -53,6 +55,7 @@ int main(int argc, char *argv[]) {
       syslog(LOG_ERR, "Channel read error %s", SERVER_FIFO_NAME);
       return 2;
    }
+
    while ((nread = read(fd_server, &msg, sizeof(msg))) > 0)
    {
       syslog(LOG_INFO, "Got request from %i\n", msg.sm_clientpid);
@@ -102,7 +105,7 @@ int main(int argc, char *argv[]) {
                }
             }
 
-            if(messageLength == 0) {
+            if (messageLength == 0) {
                strcpy(msg.sm_data, "Incorrect entry");
                write(fd_client, &msg, sizeof(msg));
             }
@@ -115,6 +118,7 @@ int main(int argc, char *argv[]) {
             fd_client = open(pfifoname, O_WRONLY);
             syslog(LOG_INFO, "Server closed\n");
             strcpy(msg.sm_data, "Invalid entry");
+            
             write(fd_client, &msg, sizeof(msg));
             close(fd_client);
             unlink(pfifoname);
@@ -124,10 +128,11 @@ int main(int argc, char *argv[]) {
          }
          _exit(0);
       }
-      else if(forkPid < 0) {
+      else if (forkPid < 0) {
          syslog(LOG_ERR, "Request from %i hasn't been completed", msg.sm_clientpid);
       }
    }
+
    close(fd_server);
    _exit(0);
    return 0;
