@@ -4,10 +4,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>
-#include <sys/types.h>
-#include <time.h>
-#include <errno.h>
-#include <sys/fcntl.h>
 #include <syslog.h>
 #include <dirent.h>
 #include "func.h"
@@ -15,97 +11,76 @@
 
 void writeNlastlinesfromfile(char* name, int fd_client, struct simplemessage msg, int N) {
     FILE* filePointer;
-    int bufferLength = 255;
-    char buffer[bufferLength];
-    ssize_t read_bytes;
+    char buffer[LINEBUFFER];
+    struct stat file_stat;
 
-    if (lstat(name, &buffer) < 0) {
-		strcpy(msg.sm_data, "This file doesn't exist\n");
+    if (lstat(name, &file_stat) < 0) {
+        strcpy(msg.sm_data, "File does not exist\n");
         syslog(LOG_INFO, "Client %d: %s", msg.sm_clientpid, msg.sm_data);
         write(fd_client, &msg, sizeof(msg));
         return;
-	}
+    }
 
-    filePointer = fopen(name, "r");
-    if (filePointer == -1) {
-        syslog(LOG_ERR, "Client %i failed to open file", msg.sm_clientpid);
+    if (!(filePointer = fopen(name, "r"))) {
+        syslog(LOG_ERR, "Client %d: failed to open file %s", msg.sm_clientpid, name);
         strcpy(msg.sm_data, "Failed to open file\n");
         write(fd_client, &msg, sizeof(msg));
         return;
     }
 
-    int linesCount = 0;
-    while (fgets(buffer, bufferLength, filePointer)) {
-        linesCount++;
-    }
+    int line_count = 0;
+    while (fgets(buffer, sizeof(buffer), filePointer)) line_count++;
+    rewind(filePointer);
 
-    filePointer = fopen(name, "r");
-    int counter = 0;
-    char* to_return = malloc(strlen(buffer) * N);
-    strcpy(to_return, "\0");
-    int i = 0;
+    char result[N * LINEBUFFER];
+    memset(result, 0, sizeof(result));
+    int current_line = 0;
 
-    while (fgets(buffer, bufferLength, filePointer)) {
-        if (counter >= (linesCount - N)) {
-            strcat(to_return, buffer);
-            i++;
+    while (fgets(buffer, sizeof(buffer), filePointer)) {
+        if (current_line++ >= (line_count - N)) {
+            strncat(result, buffer, sizeof(result) - strlen(result) - 1);
         }
-        counter++;
     }
 
     fclose(filePointer);
-    strcpy(msg.sm_data, to_return);
-    free(to_return);
+    strcpy(msg.sm_data, result);
     write(fd_client, &msg, sizeof(msg));
-    return;
 }
 
 void writeisfilesymboliclink(char* name, int fd_client, struct simplemessage msg) {
-	struct stat buff;
-	if (lstat(name, &buff) < 0) {
-		strcpy(msg.sm_data, "This file doesn't exist\n");
+    struct stat file_stat;
+    if (lstat(name, &file_stat) < 0) {
+        strcpy(msg.sm_data, "File does not exist\n");
         syslog(LOG_INFO, "Client %d: %s", msg.sm_clientpid, msg.sm_data);
         write(fd_client, &msg, sizeof(msg));
         return;
-	}
-    syslog(LOG_INFO, "Client %i: file exist", msg.sm_clientpid);
-
-	if (S_ISLNK(buff.st_mode) == 1) {
-		strcpy(msg.sm_data, "It's a symbolic link\n");
     }
-	else {
-       strcpy(msg.sm_data, "It's not a symbolic link\n");
-	}
+
+    if (S_ISLNK(file_stat.st_mode)) {
+        strcpy(msg.sm_data, "File is a symbolic link\n");
+    } else {
+        strcpy(msg.sm_data, "File is not a symbolic link\n");
+    }
     write(fd_client, &msg, sizeof(msg));
-    return;
 }
 
 void writefilemetadata(char* name, int fd_client, struct simplemessage msg) {
-    struct stat buff;
-    int temp = 0;
+    struct stat file_stat;
 
-	if (stat(name, &buff) == -1) {
-        syslog(LOG_ERR, "Client %i: file doesn't exist", msg.sm_clientpid);
-        strcpy(msg.sm_data, "This file doesn't exist\n");
+    if (stat(name, &file_stat) < 0) {
+        syslog(LOG_ERR, "Client %d: file does not exist", msg.sm_clientpid);
+        strcpy(msg.sm_data, "File does not exist\n");
         write(fd_client, &msg, sizeof(msg));
         return;
-	}
+    }
 
-    syslog(LOG_INFO, "Client %i: file exist", msg.sm_clientpid);
+    char metadata[3 * BUFFERSIZE];
+    snprintf(metadata, sizeof(metadata),
+             "Last status change: %sLast file access: %sLast file modification: %s",
+             ctime(&file_stat.st_ctime),
+             ctime(&file_stat.st_atime),
+             ctime(&file_stat.st_mtime));
 
-    char* toReturn = malloc(3 * (30 + strlen(ctime(&buff.st_ctime))));
-    
-    strcpy(toReturn, "Last status change:  ");
-    strcat(toReturn, ctime(&buff.st_ctime));
-
-    strcat(toReturn, "Last file access:    ");
-    strcat(toReturn, ctime(&buff.st_atime));
-
-    strcat(toReturn, "Last file change:    ");
-    strcat(toReturn, ctime(&buff.st_mtime));
-    strcpy(msg.sm_data, toReturn);
-
-    free(toReturn);
+    strcpy(msg.sm_data, metadata);
     write(fd_client, &msg, sizeof(msg));
-    return;
 }
