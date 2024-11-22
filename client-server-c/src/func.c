@@ -28,12 +28,10 @@ void writeNlastlinesfromfile(char* name, int fd_client, struct simplemessage msg
         return;
     }
 
-    // Count total lines
     int line_count = 0;
     while (fgets(buffer, sizeof(buffer), filePointer)) line_count++;
     rewind(filePointer);
 
-    // Read last N lines
     char result[N * LINEBUFFER];
     memset(result, 0, sizeof(result));
     int current_line = 0;
