@@ -7,19 +7,19 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>
-#include <fcntl.h>
 #include <syslog.h>
 
-#define PERM_FILE S_IRUSR|S_IWUSR|S_IROTH
+#define PERM_FILE (S_IRUSR | S_IWUSR | S_IROTH)
 #define SERVER_FIFO_NAME "/tmp/fifo.request"
 #define FIFO_PREFIX "/tmp/fifo.answer"
 #define BUFFERSIZE 256
+#define PATHSIZE 1035
+#define LINEBUFFER 255
 
-struct simplemessage
-{
-	pid_t sm_clientpid;
-	char sm_data[256];
-	int N;
+struct simplemessage {
+    pid_t sm_clientpid;
+    char sm_data[BUFFERSIZE];
+    int N;
 };
 
 void showmenu();
