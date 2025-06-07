@@ -12,7 +12,7 @@ This C project demonstrates local client-server (daemon) interactions using UNIX
 1. Clone this repository to your local machine:
 
     ```
-    git clone https://github.com/malandrii/local-client-server-linux
+    git clone https://github.com/andrii-malakhovtsev/local-client-server-linux
     ```
 2. Compile the server program:
 
